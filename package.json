@@ -1,0 +1,16 @@
+{
+  "name": "storegate-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A deterministic, 12-second StoreGate runtime policy demo.",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
