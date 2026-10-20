@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: "20"
           package-manager-cache: false
-      - name: Test the demo policy
+      - name: Test the policy engine and integration
         run: npm test
       - name: Build the static site
         run: npm run build

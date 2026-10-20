@@ -1,14 +1,27 @@
 {
-  "name": "storegate-demo",
-  "version": "0.2.0",
+  "name": "storegate",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Three deterministic StoreGate policy walkthroughs illustrating the StemJSON integration boundary.",
+  "description": "Dependency-free deterministic policy engine for sensitive structured actions, with a shared-engine demo.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "examples/",
+    "README.md"
+  ],
   "scripts": {
-    "start": "node scripts/serve.mjs",
-    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/build.mjs && node scripts/serve.mjs",
+    "dev": "npm start",
     "build": "node scripts/build.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "example": "node examples/host-integration.mjs"
   },
   "engines": {
     "node": ">=20"

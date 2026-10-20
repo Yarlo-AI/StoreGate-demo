@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#080f20" />
     <meta
       name="description"
-      content="A valid module can still contain a policy-sensitive action. See where StoreGate complements StemJSON in three deterministic 10-second walkthroughs."
+      content="StoreGate 1.0: a reusable deterministic policy engine for sensitive structured actions. Try the same engine with payments, privacy, and permissions scenarios."
     />
-    <title>StoreGate v0.2 — Valid structure. Context still matters.</title>
+    <title>StoreGate v1.0 — Deterministic policy engine</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=0.2.0" />
-    <script type="module" src="./app.js?v=0.2.0"></script>
+    <link rel="stylesheet" href="./styles.css?v=1.0.0" />
+    <script type="module" src="./app.js?v=1.0.0"></script>
   </head>
   <body>
     <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -35,7 +35,7 @@
             <use href="#shield" /></svg
           >StoreGate<span>.</span></a
         >
-        <span class="header-label"><i></i> INTERACTIVE DEMO <b>v0.2</b></span>
+        <span class="header-label"><i></i> POLICY ENGINE <b>v1.0</b></span>
       </header>
       <main>
         <section class="intro" aria-labelledby="page-title">
@@ -100,8 +100,13 @@
             </li>
           </ol>
           <p class="simulation-note">
-            Illustrated integration: LLM + StemJSON stages are simulated.
-            <code>validate()</code> checks a local demo fixture.
+            LLM + StemJSON stages are simulated; <code>validate()</code> checks
+            a local fixture. Policy decisions run through the reusable StoreGate
+            engine.
+            <span class="engine-meta"
+              >Engine <b id="engine-version">1.0.0</b> · Policies
+              <b id="policy-version">1.0.0</b></span
+            >
           </p>
           <div class="scenario-tabs" role="tablist" aria-label="Demo scenarios">
             <button
@@ -152,7 +157,7 @@
             <div class="demo-toolbar">
               <div class="scenario-heading">
                 <h2 id="scenario-name">External digital purchase</h2>
-                <span>10-second walkthrough</span>
+                <span>10-second walkthrough · editable runtime context</span>
               </div>
               <div class="run-controls">
                 <button id="run" class="run-button" type="button">
@@ -240,6 +245,10 @@
                 <div class="runtime-context">
                   <span class="tiny-label">RUNTIME CONTEXT</span>
                   <dl id="context-fields"></dl>
+                  <p class="context-hint">
+                    Change a boolean to test the engine. Host context is
+                    simulated here.
+                  </p>
                 </div>
                 <p class="gate-explainer">
                   The module stays valid.<br />The action waits for a policy
@@ -274,6 +283,9 @@
                   </div>
                   <div class="verdict" hidden>
                     <div class="verdict-state">
+                      <svg class="pass-icon" aria-hidden="true">
+                        <use href="#check" />
+                      </svg>
                       <svg
                         class="block-icon"
                         aria-hidden="true"
@@ -297,6 +309,11 @@
                     <div class="verdict-detail suggestion-detail">
                       <span class="tiny-label">SUGGESTED SAFER ACTION</span>
                       <p id="suggestion"></p>
+                      <p class="rule-match">
+                        <span class="tiny-label">MATCHED RULE</span><br /><code
+                          id="matched-rule"
+                        ></code>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -339,23 +356,37 @@
             </p></noscript
           >
         </section>
+        <details class="integration-details result-details">
+          <summary>
+            Engine result
+            <span>exact JSON returned by evaluate({ action, context })</span>
+          </summary>
+          <pre id="result-json">
+Run StoreGate to inspect the engine's JSON result.</pre
+          >
+        </details>
         <details class="integration-details">
           <summary>
             The integration boundary <span>validate → policy → execute</span>
           </summary>
           <div>
             <p>
-              Structural validation checks the module’s shape. StoreGate then
-              normalizes and checks only its sensitive action. A BLOCK or REVIEW
+              Keep structural validation in the host. Adapt the sensitive
+              action, then call the same engine used above. A BLOCK or REVIEW
               holds execution; only PASS is eligible to proceed.
             </p>
-            <pre><code>// Conceptual host integration — not a StemJSON API example
-if (validate(module).valid) {
-  const action = normalize(module.action);
-  const verdict = checkPolicy(action, runtimeContext);
-  if (verdict.decision === "PASS") execute(action);
+            <pre><code>import { adaptStructuredAction, evaluate } from "storegate";
+
+// After the host's structural validator succeeds:
+const { action } = adaptStructuredAction(module.action);
+const verdict = evaluate({ action, context: trustedContext });
+if (verdict.decision === "PASS") {
+  execute(verdict.normalizedAction);
 }</code></pre>
             <p>
+              <a href="https://github.com/Yarlo-AI/StoreGate-demo#readme"
+                >Integration contract, policy scope, and runnable example →</a
+              ><br />
               This static demo uses local fixtures and never calls
               <code>execute()</code>, a model, an external service, or a
               StemJSON SDK.

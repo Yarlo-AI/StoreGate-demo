@@ -1,11 +1,13 @@
-import { SCENARIOS } from "./scenarios.js?v=0.2.0";
+import { SCENARIOS } from "./scenarios.js?v=1.0.0";
+import { validateDemoModule } from "./module-validation.js?v=1.0.0";
 import {
-  DEMO_DURATION,
-  validateDemoModule,
-  normalizeAction,
-  evaluateAction,
-} from "./policy.js?v=0.2.0";
+  adaptStructuredAction,
+  evaluate,
+  ENGINE_VERSION,
+  POLICY_VERSION,
+} from "./engine/v1.0.0/index.js";
 
+const DEMO_DURATION = 10_000;
 const $ = (selector) => document.querySelector(selector);
 const demo = $(".demo");
 const run = $("#run");
@@ -73,6 +75,7 @@ const phases = [
 let selected = SCENARIOS[0];
 let validation;
 let normalized;
+let runtimeContext;
 let verdict;
 let frame = null;
 let startedAt = 0;
@@ -104,6 +107,9 @@ function resetPlayback() {
   $(".timeline").setAttribute("aria-valuenow", "0");
   $(".result-placeholder").hidden = false;
   $(".verdict").hidden = true;
+  $("#result-json").textContent =
+    "Run StoreGate to inspect the engine's JSON result.";
+  $("#matched-rule").textContent = "";
   for (const detail of document.querySelectorAll(".verdict-detail"))
     detail.classList.remove("is-visible");
   $("#source-status").textContent =
@@ -125,13 +131,23 @@ function selectScenario(id) {
   if (!next) return;
   selected = next;
   validation = validateDemoModule(selected.module);
-  normalized = normalizeAction(selected.module.action);
+  const adapted = adaptStructuredAction(selected.module.action);
+  normalized = adapted.action;
+  runtimeContext = structuredClone(selected.context);
   resetPlayback();
   demo.dataset.scenario = id;
   tabs.forEach((tab) => {
     const active = tab.dataset.scenario === id;
     tab.setAttribute("aria-selected", String(active));
     tab.tabIndex = active ? 0 : -1;
+    const fixture = SCENARIOS.find((item) => item.id === tab.dataset.scenario);
+    updateTabVerdict(
+      tab,
+      evaluate({
+        action: adaptStructuredAction(fixture.module.action).action,
+        context: fixture.context,
+      }).decision,
+    );
   });
   $("#scenario-panel").setAttribute("aria-labelledby", `tab-${id}`);
   $("#scenario-name").textContent = selected.name;
@@ -140,18 +156,39 @@ function selectScenario(id) {
   $("#raw-action").textContent = selected.raw;
   $("#metadata").textContent = selected.metadata;
   $("#rule-note").textContent = selected.ruleNote;
-  const types = normalized.types.map((type) => {
+  const types = adapted.categories.map((type) => {
     const item = document.createElement("li");
     item.textContent = type;
     return item;
   });
   $("#normalized-types").replaceChildren(...types);
-  const fields = Object.entries(selected.context).map(([key, value]) => {
+  const fields = Object.entries(runtimeContext).map(([key, value]) => {
     const pair = document.createElement("div");
     const term = document.createElement("dt");
     const description = document.createElement("dd");
     term.textContent = key;
-    description.textContent = String(value);
+    if (typeof value === "boolean") {
+      const toggle = document.createElement("input");
+      const label = document.createElement("label");
+      const text = document.createElement("span");
+      toggle.type = "checkbox";
+      toggle.checked = value;
+      toggle.setAttribute("aria-label", key.replaceAll("_", " "));
+      text.textContent = String(value);
+      toggle.addEventListener("change", () => {
+        runtimeContext[key] = toggle.checked;
+        text.textContent = String(toggle.checked);
+        resetPlayback();
+        updateTabVerdict(
+          tabs.find((tab) => tab.dataset.scenario === selected.id),
+          evaluate({ action: normalized, context: runtimeContext }).decision,
+        );
+        $("#narration").textContent =
+          "Context updated. Run the engine again to inspect the decision and matched rule.";
+      });
+      label.append(toggle, text);
+      description.append(label);
+    } else description.textContent = String(value);
     pair.append(term, description);
     return pair;
   });
@@ -165,6 +202,12 @@ function selectScenario(id) {
   }
 }
 
+function updateTabVerdict(tab, decision) {
+  const label = tab.querySelector(".scenario-verdict");
+  label.textContent = decision;
+  label.className = `scenario-verdict ${decision.toLowerCase()}`;
+}
+
 function applyPhase(phase) {
   if (activePhase === phase.name) return;
   activePhase = phase.name;
@@ -174,7 +217,7 @@ function applyPhase(phase) {
       "current",
       index === phase.node && phase.name !== "complete",
     );
-    // execute() never receives a completion check: these fixtures remain held.
+    // The demo never dispatches an action, including when the engine returns PASS.
     node.classList.toggle("done", index < Math.min(phase.node, 4));
     if (index === phase.node) node.setAttribute("aria-current", "step");
     else node.removeAttribute("aria-current");
@@ -199,19 +242,29 @@ function applyPhase(phase) {
     $("#decision").textContent = verdict.decision;
     $("#reason").textContent = verdict.reason;
     $("#suggestion").textContent = verdict.suggestion;
+    $("#matched-rule").textContent =
+      `${verdict.matchedRule.id} · ${verdict.matchedRule.pack} v${verdict.matchedRule.version}`;
+    $("#result-json").textContent = JSON.stringify(verdict, null, 2);
     $("#gate-status").textContent = "Policy decision returned";
     $("#gate-bottom").textContent = "Module remains structurally valid";
     nodes[4].querySelector(".node-status").textContent = verdict.decision;
     const blocked = verdict.decision === "BLOCK";
+    const passed = verdict.decision === "PASS";
     nodes[5].querySelector(".node-status").textContent = blocked
       ? "Stopped · not called"
-      : "Held · needs review";
+      : passed
+        ? "Eligible · simulated"
+        : "Held · needs review";
     $("#execution-status").textContent = blocked
       ? "execute() stopped — no action executed"
-      : "execute() held — review required";
+      : passed
+        ? "PASS eligible — demo does not execute"
+        : "execute() held — review required";
     narration = blocked
       ? "BLOCK. The module is still valid. StoreGate stops this sensitive action before execute()."
-      : "REVIEW. The module is still valid. StoreGate holds execution for a narrower action or human review.";
+      : passed
+        ? "PASS under the matched rule. The host could dispatch this exact action; the demo never executes it."
+        : "REVIEW. The module is still valid. StoreGate holds execution for a narrower action or human review.";
     if (phase.at >= 8000)
       narration = `${verdict.decision}. ${verdict.suggestion} No sensitive action is executed.`;
   }
@@ -244,7 +297,7 @@ function tick(now) {
 run.addEventListener("click", () => {
   if (frame !== null || !validation.valid) return;
   resetPlayback();
-  verdict = evaluateAction(normalized, selected.context);
+  verdict = evaluate({ action: normalized, context: runtimeContext });
   run.disabled = true;
   reset.disabled = false;
   run.querySelector("span").textContent = "Running…";
@@ -272,4 +325,6 @@ for (const [index, tab] of tabs.entries()) {
     tabs[next].focus({ preventScroll: true });
   });
 }
+$("#engine-version").textContent = ENGINE_VERSION;
+$("#policy-version").textContent = POLICY_VERSION;
 selectScenario(selected.id);

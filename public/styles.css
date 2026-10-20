@@ -296,6 +296,62 @@ h1 span {
 .review {
   color: var(--review);
 }
+.pass {
+  color: var(--blue);
+}
+.engine-meta {
+  display: block;
+  color: #b1c7df;
+  margin-top: 5px;
+}
+.engine-meta b {
+  font-weight: 500;
+}
+.context-hint {
+  color: var(--muted);
+  font: 10px/1.5 var(--sans);
+  margin: 10px 0 0;
+}
+#context-fields label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  cursor: pointer;
+}
+#context-fields input {
+  accent-color: var(--blue);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+#context-fields input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.rule-match code {
+  font: 10px/1.6 var(--mono);
+  overflow-wrap: anywhere;
+  color: #a6bdd9;
+}
+.verdict-detail .rule-match {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+.integration-details a {
+  color: var(--blue);
+}
+.result-details > pre {
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 6px;
+  background: #101e32;
+  font: 11px/1.6 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #afcce9;
+}
 .tab-arrow {
   margin-left: auto;
   color: #829bbd;
@@ -740,7 +796,8 @@ h1 span {
   color: #8ed0ff;
   margin-bottom: 0;
 }
-.review-icon {
+.review-icon,
+.pass-icon {
   display: none;
 }
 .progress-row {
@@ -911,6 +968,23 @@ h1 span {
 }
 .demo[data-verdict="review"] .review-icon {
   display: block;
+}
+.demo[data-verdict="pass"] .block-icon {
+  display: none;
+}
+.demo[data-verdict="pass"] .pass-icon {
+  display: block;
+}
+.demo[data-verdict="pass"] .verdict-state,
+.demo[data-verdict="pass"] #execution-status,
+.demo[data-verdict="pass"] .execution-node .node-status {
+  color: var(--blue);
+}
+.demo[data-verdict="pass"] .result-stage {
+  border-color: #3e80a9;
+}
+.demo[data-verdict="pass"] .result-stage .stage-dot {
+  background: var(--blue);
 }
 .demo[data-phase="verdict"] .verdict-state {
   animation: reveal 0.4s ease-out;
