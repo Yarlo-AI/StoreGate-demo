@@ -109,6 +109,8 @@ The workflow runs `npm test` and `npm run build`, then deploys `dist/` with the 
 
 All asset and home links are relative, including the JavaScript module imports, so the site works under `/StoreGate-demo/` and at localhost. `dist/` is generated on the runner and stays out of Git.
 
+CSS, JavaScript, and JavaScript module imports carry a release query (`?v=0.2.0`) to avoid mixing cached files from different releases. Bump those queries together when changing the demo's assets.
+
 For an optional Vercel deployment, import the repository, use `npm run build` as the build command, and `dist` as the output directory. The included `vercel.json` provides those settings; GitHub Pages remains the existing deployment target.
 
 ## File structure

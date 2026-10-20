@@ -1,10 +1,10 @@
-import { SCENARIOS } from "./scenarios.js";
+import { SCENARIOS } from "./scenarios.js?v=0.2.0";
 import {
   DEMO_DURATION,
   validateDemoModule,
   normalizeAction,
   evaluateAction,
-} from "./policy.js";
+} from "./policy.js?v=0.2.0";
 
 const $ = (selector) => document.querySelector(selector);
 const demo = $(".demo");
