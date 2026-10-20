@@ -1,104 +1,137 @@
-# StoreGate
+# StoreGate v0.2
 
-A minimal, deterministic 12-second demo of a **runtime policy firewall for AI-generated actions**. Plain HTML, CSS, and JavaScript. No third-party runtime dependencies, backend, accounts, database, LLM calls, or paid services.
+A static, deterministic demo of a **runtime policy firewall for AI-generated actions**, showing the intended integration boundary with StemJSON. Three selectable, 10-second walkthroughs. Plain HTML, CSS, and JavaScript, with no third-party runtime dependencies.
+
+**Live demo:** https://yarlo-ai.github.io/StoreGate-demo/
 
 ## Run locally
 
-Prerequisite: Node.js 20 or later, with npm.
-
-From this project directory, run one command (no install step needed):
+Prerequisite: Node.js 20 or later, with npm. From this directory, run:
 
 ```sh
 npm start
 ```
 
-Open **http://localhost:3000**. Stop the server with Ctrl+C. `npm run dev` is an alias. To use another port in PowerShell:
+No install step is required. Open **http://localhost:3000**. Stop with Ctrl+C. `npm run dev` is an alias. To use another port in PowerShell:
 
 ```powershell
 $env:PORT = "3001"
 npm start
 ```
 
-Click **Run StoreGate**. The demo intercepts the mock button's structured action, checks the runtime context, and reveals the result. Reset cancels an in-progress run; Run again replays it. The decorative Continue button never opens a checkout.
+Choose a scenario and click **Run StoreGate**. **Reset** cancels playback; **Run again** replays it. Selecting another scenario also cancels the current run and clears its result. The mock Continue button never performs an action.
 
-## The one demo scenario
+## The integration point
 
 ```text
-Action:   open_url(stripe_checkout)
-          product = digital_subscription
-
-Context:  platform = iOS
-          storefront = DE
-          external_purchase_entitlement = false
-
-Decision: BLOCK
-Reason:   External digital purchase detected
-Context:  iOS / DE storefront / entitlement missing
-Suggested action: Use approved in-app purchase flow
+User Prompt → LLM → StemJSON → validate() → StoreGate → execute()
+                              structure     policy       held
 ```
 
-This is an illustrative, fixed demo rule, **not a prediction of Apple review**, a comprehensive statement of current App Store rules, or a production policy engine. Unmodeled inputs return REVIEW, not an implied approval. PASS / BLOCK / REVIEW in the footer are the decision vocabulary; this demo exercises BLOCK only.
+**StoreGate complements StemJSON validation. It does not replace it.**
 
-## Animation
+**Structure can be valid while the action is still policy-sensitive.**
 
-| Time      | Visible step                                        |
-| --------- | --------------------------------------------------- |
-| 0–2.2 s   | Capture the generated Continue action               |
-| 2.2–5.2 s | Inspect the structured action and runtime context   |
-| 5.2–8 s   | Apply the illustrative blocking rule                |
-| 8–12 s    | Reveal BLOCK, reason, context, and suggested action |
+StemJSON says the module is valid. StoreGate asks whether the sensitive action is acceptable in this runtime context. The first four pipeline steps establish structural validity; StoreGate intercepts only the sensitive action at the execution boundary.
 
-Animation time is presentation pacing, not a policy-engine latency benchmark. The decision is computed synchronously in the browser. The timeline uses elapsed time rather than chained timers; reset cancels the animation frame. If the browser suspends a background tab, the visible timeline catches up when resumed.
+The LLM and StemJSON stages are illustrated using fixed fixtures. `validateDemoModule()` is a small local shape check, not an implementation of StemJSON's schema or an integration with its actual API. The expandable UI example is conceptual host pseudocode, not an SDK. No model, external API, device permission, contact data, or checkout is used.
 
-On narrow screens, the panels stack and the walkthrough scrolls to the active panel. With `prefers-reduced-motion: reduce`, moving effects and automatic scrolling are disabled while the same timed, accessible text sequence remains. Stage announcements use a polite live region; controls work with a keyboard.
+## Three scenarios
 
-## Deploy to GitHub Pages
+| Scenario                        | Generated action                           | Normalized types                                                   | Result |
+| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------ | ------ |
+| External digital purchase       | `open_url(stripe_checkout)`                | `OPEN_EXTERNAL_URL`, `PURCHASE`                                    | BLOCK  |
+| Personal data to third-party AI | `send_to_ai(provider = third_party_ai)`    | `SEND_TO_THIRD_PARTY_AI`, `SHARE_PERSONAL_DATA`, `ACCESS_CONTACTS` | BLOCK  |
+| Broad permission request        | `request_permission(contacts_full_access)` | `REQUEST_PERMISSION`, `ACCESS_CONTACTS`                            | REVIEW |
 
-Public demo: **https://Yarlo-AI.github.io/StoreGate-demo/**
+### A — External digital purchase
 
-Repository: **https://github.com/Yarlo-AI/StoreGate-demo**
+- Metadata: `product = digital_subscription`
+- Runtime context: `platform = iOS`, `storefront = DE`, `external_purchase_entitlement = false`
+- Reason: External digital purchase action detected in a context requiring additional store-policy handling.
+- Suggested safer action: Use the approved in-app purchase flow or route for review.
 
-Every push to `main` runs `.github/workflows/pages.yml`: it checks out the source, sets up Node.js 20, runs `npm test` and `npm run build`, and publishes `dist/` using the official GitHub Pages actions. There are no dependencies to install. The workflow can also be started manually from the repository's Actions tab.
+This is an illustrative store-policy rule, **not a prediction of Apple review** or a comprehensive statement of current App Store rules.
 
-GitHub Pages uses **GitHub Actions** as its build source. Authentication uses the workflow's automatically provided `GITHUB_TOKEN`; no custom secret, API key, environment variable, or paid service is needed. `dist/` stays out of Git and is built on the runner.
+### B — Personal data to third-party AI
 
-All asset and home links are relative, so the site works both at localhost and under the `/StoreGate-demo/` project path. For future updates, commit the changes and push to `main`; wait for the Pages workflow to finish before sharing the updated site.
+- Data: `contacts`
+- Runtime context: `consent_for_third_party_ai = false`, `disclosure_present = false`
+- Reason: Personal data is about to be sent to a third-party AI provider without the required disclosure/consent state.
+- Suggested safer action: Insert disclosure + explicit consent before execution.
 
-Official instructions: [Deploying GitHub Pages with custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+### C — Broad permission request
 
-The existing `vercel.json` is retained as a legacy file and is not used by this deployment.
+- Intent: `select_three_contacts`
+- Runtime context: `platform = Android`, `narrower_picker_available = true`
+- Reason: Requested access appears broader than necessary for the stated intent.
+- Suggested safer action: Use a narrower contact picker or request human review.
 
-## Verification commands
+The UI displays the raw action, normalized types, runtime context, verdict, reason, and safer action for each scenario. BLOCK stops execution; REVIEW holds execution for a revised action or human review. All three fixture modules remain structurally VALID.
+
+`normalizeAction()` maps explicit structured fields with deterministic JavaScript rules. `evaluateAction()` is a pure, intentionally small demo evaluator. Missing or unmodeled inputs return REVIEW. The known data-to-AI rule can return PASS only when both consent and disclosure are boolean `true`; that boundary is unit-tested, but there is no fourth selectable scenario or real execution. PASS means eligible under that modeled rule, not blanket policy approval.
+
+## Playback and accessibility
+
+| Time      | Visible step                                            |
+| --------- | ------------------------------------------------------- |
+| 0–2.5 s   | User prompt → illustrated LLM → StemJSON output         |
+| 2.5–3.5 s | `validate()` confirms structural validity               |
+| 3.5–4.8 s | Sensitive action is intercepted and normalized          |
+| 4.8–6.5 s | StoreGate checks runtime context                        |
+| 6.5–8 s   | BLOCK or REVIEW and its reason appear                   |
+| 8–10 s    | Safer action appears; `execute()` stays stopped or held |
+
+The decision is computed synchronously; the 10 seconds are presentation pacing, not an engine latency benchmark. Playback uses elapsed time with `requestAnimationFrame`, so a suspended tab catches up on return.
+
+Scenario tabs support Left/Right, Home/End, and native Enter/Space activation. Run and Reset are keyboard-accessible. A polite live region announces the stages. On mobile, panels stack and playback scrolls to the active stage, with controls remaining accessible. With `prefers-reduced-motion: reduce`, moving effects, transitions, and automatic scrolling are disabled while the timed text sequence remains.
+
+## Verification
 
 ```sh
 npm test
 npm run build
 ```
 
-The tests check the exact scenario result and prevent accidental approval or blocking of unmodeled inputs. The build copies the self-contained assets into `dist/` for static hosting. Browser QA should check the full sequence, reset during playback, replay, keyboard controls, reduced motion, and laptop/mobile text fit.
+Tests cover all three exact outcomes and normalizations, independent structural validation, consent boundaries, unknown/missing context, malformed modules, and conservative handling of unmodeled actions. The build copies the self-contained assets to `dist/`.
 
-Verified locally on October 7, 2026: policy tests and static build passed; the browser reached Intercept at 0 s, Inspect at 2.21 s, Enforce at 5.20 s, Verdict at 8.01 s, and Complete at 12.00 s. Reset during replay returned to the idle state. Responsive checks covered 320, 390, 820, 1024, and 1366 CSS-pixel widths. Keyboard activation and the reduced-motion setting were also checked.
+Browser checks should cover all three full walkthroughs, reset/replay, switching during playback, keyboard tabs, reduced motion, and laptop/mobile text fit. No sensitive action should execute in any of the three scenarios.
+
+## Deploy
+
+The existing GitHub Pages site uses `.github/workflows/pages.yml`. Push a committed change to `main`:
+
+```sh
+git push origin main
+```
+
+The workflow runs `npm test` and `npm run build`, then deploys `dist/` with the official GitHub Pages actions. Pages uses **GitHub Actions** as its build source. The workflow can also be run manually in the repository's Actions tab. No custom secret or paid service is required.
+
+All asset and home links are relative, including the JavaScript module imports, so the site works under `/StoreGate-demo/` and at localhost. `dist/` is generated on the runner and stays out of Git.
+
+For an optional Vercel deployment, import the repository, use `npm run build` as the build command, and `dist` as the output directory. The included `vercel.json` provides those settings; GitHub Pages remains the existing deployment target.
 
 ## File structure
 
 ```text
 StoreGate-demo/
   .github/workflows/
-    pages.yml          Test, build, and deploy to GitHub Pages on main
+    pages.yml          Test, build, and deploy main to GitHub Pages
   public/
-    index.html         Semantic demo layout and inline vector symbols
-    styles.css         Responsive layout, transitions, reduced-motion support
-    app.js             Twelve-second playback, narration, reset, and replay
-    policy.js          Fixed scenario and pure deterministic rule
-    favicon.svg        StoreGate mark
+    index.html         Six-step pipeline and three scenario tabs
+    styles.css         Responsive layout and reduced-motion support
+    app.js             Ten-second playback, keyboard tabs, reset/replay
+    scenarios.js       Fixed modules, metadata, and runtime contexts
+    policy.js          Shape check, normalization, and demo policy rules
+    favicon.svg        StoreGate shield
   scripts/
     serve.mjs          Dependency-free local static server
-    build.mjs          Copy public assets to dist for deployment
+    build.mjs          Copy public assets to dist
   test/
-    policy.test.js     Scenario and out-of-scope checks
-  package.json         Local commands; no dependencies
-  vercel.json          Legacy settings; unused by GitHub Pages
+    policy.test.js     Normalization, validity, and policy boundary tests
+  package.json         Commands; no dependencies
+  vercel.json          Optional static Vercel deployment settings
   README.md
 ```
 
-The local Node server is a development convenience. Production contains only static assets. All visuals are CSS or inline SVG; there are no external fonts, trackers, or network requests to third-party services.
+The Node server is only a local development convenience. Production contains static assets. There is no backend, database, account system, analytics, SDK, wallet/token logic, external font, LLM call, or external API request.

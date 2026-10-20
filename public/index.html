@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#080f20" />
     <meta
       name="description"
-      content="Watch StoreGate intercept a sensitive AI-generated action in a 12-second interactive runtime policy demo."
+      content="A valid module can still contain a policy-sensitive action. See where StoreGate complements StemJSON in three deterministic 10-second walkthroughs."
     />
-    <title>StoreGate — Before an action becomes a risk.</title>
+    <title>StoreGate v0.2 — Valid structure. Context still matters.</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./app.js"></script>
@@ -33,288 +33,347 @@
         <a class="wordmark" href="./" aria-label="StoreGate home"
           ><svg class="brand-shield" aria-hidden="true">
             <use href="#shield" /></svg
-          >StoreGate<span class="brand-period">.</span></a
+          >StoreGate<span>.</span></a
         >
-        <span class="header-label"
-          ><span class="status-dot"></span> INTERACTIVE DEMO
-          <span class="version">/ 001</span></span
-        >
+        <span class="header-label"><i></i> INTERACTIVE DEMO <b>v0.2</b></span>
       </header>
-
       <main>
         <section class="intro" aria-labelledby="page-title">
           <div>
-            <p class="eyebrow">BETWEEN GENERATION AND EXECUTION</p>
+            <p class="eyebrow">AFTER VALIDATION. BEFORE EXECUTION.</p>
             <h1 id="page-title">
-              AI generates the action.<br /><span
-                >StoreGate sets the boundary.</span
-              >
+              Valid structure.<br /><span>Context still matters.</span>
             </h1>
-            <p class="intro-copy">
-              A harmless-looking button. A sensitive action underneath.<br
-                class="desktop-break"
-              />
-              See what happens before it reaches the user.
+          </div>
+          <div class="intro-copy">
+            <p>
+              StemJSON says the module is valid.<br />StoreGate asks whether the
+              sensitive action is acceptable in this runtime context.
+            </p>
+            <p class="complement">
+              StoreGate complements StemJSON validation. It does not replace it.
             </p>
           </div>
-          <div class="scenario-note">
-            <span class="tiny-label">THE SCENARIO</span
-            ><span>One tap.<br />An external digital purchase.</span
-            ><span class="scenario-platform"
-              >iOS <span>/</span> DE storefront</span
-            >
-          </div>
         </section>
-
         <section
           class="demo"
-          aria-label="StoreGate interactive policy demo"
           data-phase="idle"
+          data-verdict="pending"
+          aria-label="StoreGate integration demo"
         >
-          <div class="demo-toolbar">
-            <div class="run-controls">
-              <button id="run" class="run-button" type="button">
-                <svg aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="m9 5 10 7-10 7Z" /></svg
-                ><span>Run StoreGate</span>
-              </button>
-              <button id="reset" class="reset-button" type="button" disabled>
-                <svg aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" /></svg
-                >Reset
-              </button>
-            </div>
-            <div class="playback">
-              <span id="playback-label">12-second walkthrough</span
-              ><span class="playback-divider">/</span
-              ><span id="elapsed">00</span
-              ><span class="time-total">: 12 s</span>
-            </div>
-          </div>
-
-          <div class="demo-canvas">
-            <article
-              class="stage source-stage"
-              id="source-stage"
-              aria-labelledby="source-title"
+          <div class="pipeline-header">
+            <span class="tiny-label">THE INTEGRATION POINT</span
+            ><span
+              >Structure can be valid while the action is still
+              policy-sensitive.</span
             >
-              <div class="stage-heading">
-                <span class="stage-number">01</span>
-                <h2 id="source-title">AI Generated Action</h2>
-                <span class="stage-dot"></span>
+          </div>
+          <ol
+            class="pipeline"
+            aria-label="From user prompt to sensitive action execution"
+          >
+            <li data-node="0">
+              <span class="node-number">01</span><strong>User Prompt</strong
+              ><span class="node-status">Intent provided</span>
+            </li>
+            <li data-node="1">
+              <span class="node-number">02</span><strong>LLM</strong
+              ><span class="node-status">Generates module</span>
+            </li>
+            <li data-node="2">
+              <span class="node-number">03</span><strong>StemJSON</strong
+              ><span class="node-status">Structured output</span>
+            </li>
+            <li data-node="3" class="validation-node">
+              <span class="node-number">04</span><strong>validate()</strong
+              ><span class="node-status">Structure: valid</span>
+            </li>
+            <li data-node="4" class="policy-node">
+              <span class="node-number"
+                ><svg aria-hidden="true"><use href="#shield" /></svg>05</span
+              ><strong>StoreGate</strong
+              ><span class="node-status">Policy check</span>
+            </li>
+            <li data-node="5" class="execution-node">
+              <span class="node-number">06</span><strong>execute()</strong
+              ><span class="node-status">Held at the gate</span>
+            </li>
+          </ol>
+          <p class="simulation-note">
+            Illustrated integration: LLM + StemJSON stages are simulated.
+            <code>validate()</code> checks a local demo fixture.
+          </p>
+          <div class="scenario-tabs" role="tablist" aria-label="Demo scenarios">
+            <button
+              type="button"
+              role="tab"
+              id="tab-purchase"
+              aria-controls="scenario-panel"
+              aria-selected="true"
+              tabindex="0"
+              data-scenario="purchase"
+            >
+              <span class="scenario-verdict block">BLOCK</span
+              ><span>External purchase</span
+              ><span class="tab-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="tab-data"
+              aria-controls="scenario-panel"
+              aria-selected="false"
+              tabindex="-1"
+              data-scenario="data"
+            >
+              <span class="scenario-verdict block">BLOCK</span
+              ><span>Data to AI</span
+              ><span class="tab-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="tab-permission"
+              aria-controls="scenario-panel"
+              aria-selected="false"
+              tabindex="-1"
+              data-scenario="permission"
+            >
+              <span class="scenario-verdict review">REVIEW</span
+              ><span>Broad permission</span
+              ><span class="tab-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <section
+            id="scenario-panel"
+            role="tabpanel"
+            aria-labelledby="tab-purchase"
+          >
+            <div class="demo-toolbar">
+              <div class="scenario-heading">
+                <h2 id="scenario-name">External digital purchase</h2>
+                <span>10-second walkthrough</span>
               </div>
-              <div class="source-content">
-                <div class="mobile-card">
-                  <div class="phone-status">
-                    <span>9:41</span>
-                    <div class="phone-island"></div>
-                    <svg aria-hidden="true" viewBox="0 0 34 12">
-                      <path d="M1 10V7m4 3V4m4 6V1" />
-                      <rect x="16" y="2" width="13" height="8" rx="2" />
-                      <path d="M32 4v4" />
-                    </svg>
+              <div class="run-controls">
+                <button id="run" class="run-button" type="button">
+                  <svg aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="m9 5 10 7-10 7Z" /></svg
+                  ><span>Run StoreGate</span></button
+                ><button id="reset" class="reset-button" type="button" disabled>
+                  ↺ <span>Reset</span>
+                </button>
+              </div>
+            </div>
+            <div class="demo-canvas">
+              <article
+                class="stage source-stage"
+                id="source-stage"
+                aria-labelledby="source-title"
+              >
+                <div class="stage-heading">
+                  <span>01</span>
+                  <h3 id="source-title">Generated module</h3>
+                  <span class="structure-badge"
+                    ><svg aria-hidden="true"><use href="#check" /></svg
+                    >VALID</span
+                  >
+                </div>
+                <div class="source-content">
+                  <div class="prompt">
+                    <span class="tiny-label">USER PROMPT</span>
+                    <p id="prompt"></p>
                   </div>
-                  <div class="mobile-screen">
-                    <span class="app-icon"
-                      ><span></span><span></span><span></span
-                      ><span></span></span
-                    ><span class="mobile-kicker">YOUR NEXT CHAPTER</span>
-                    <h3>More possibilities.<br />One simple step.</h3>
-                    <div
+                  <div class="mobile-strip">
+                    <span class="mini-app" aria-hidden="true">▦</span
+                    ><span id="module-title"></span
+                    ><span
                       class="mock-continue"
-                      aria-label="Continue, illustrative AI-generated button"
+                      aria-label="Continue, illustrative generated button"
+                      >Continue <span aria-hidden="true">→</span></span
                     >
-                      Continue<svg aria-hidden="true"><use href="#arrow" /></svg
-                      ><span class="tap-ring"></span>
+                  </div>
+                  <div class="action-block">
+                    <span class="tiny-label">RAW GENERATED ACTION</span
+                    ><code id="raw-action"></code
+                    ><code id="metadata" class="metadata"></code>
+                  </div>
+                  <div class="normalization">
+                    <div class="normalize-label">
+                      <span aria-hidden="true">↓</span
+                      ><span class="tiny-label">NORMALIZED ACTION</span
+                      ><span class="deterministic-label">deterministic</span>
+                    </div>
+                    <ul
+                      id="normalized-types"
+                      aria-label="Normalized action types"
+                    ></ul>
+                  </div>
+                </div>
+                <div class="stage-bottom" id="source-status">
+                  Valid structure. Sensitive action unevaluated.
+                </div>
+              </article>
+              <div class="connector" aria-hidden="true">
+                <span>ACTION</span><i></i><svg><use href="#arrow" /></svg>
+              </div>
+              <article
+                class="stage gate-stage"
+                id="gate-stage"
+                aria-labelledby="gate-title"
+              >
+                <div class="stage-heading">
+                  <span>02</span>
+                  <h3 id="gate-title">Runtime policy check</h3>
+                  <i class="stage-dot"></i>
+                </div>
+                <div class="gate-brand">
+                  <div class="gate-visual" aria-hidden="true">
+                    <div class="orbit"></div>
+                    <svg><use href="#shield" /></svg>
+                    <div class="scan-line"></div>
+                  </div>
+                  <div>
+                    <strong>StoreGate<span>.</span></strong
+                    ><span id="gate-status">Only the sensitive action</span>
+                  </div>
+                </div>
+                <div class="runtime-context">
+                  <span class="tiny-label">RUNTIME CONTEXT</span>
+                  <dl id="context-fields"></dl>
+                </div>
+                <p class="gate-explainer">
+                  The module stays valid.<br />The action waits for a policy
+                  decision.
+                </p>
+                <div class="stage-bottom" id="gate-bottom">
+                  Between validate() and execute()
+                </div>
+              </article>
+              <div class="connector" aria-hidden="true">
+                <span>DECISION</span><i></i><svg><use href="#arrow" /></svg>
+              </div>
+              <article
+                class="stage result-stage"
+                id="result-stage"
+                aria-labelledby="result-title"
+              >
+                <div class="stage-heading">
+                  <span>03</span>
+                  <h3 id="result-title">Policy decision</h3>
+                  <i class="stage-dot"></i>
+                </div>
+                <div class="result-content">
+                  <div class="result-placeholder">
+                    <span class="pending-mark" aria-hidden="true">···</span>
+                    <h4>Valid doesn’t<br />mean executable.</h4>
+                    <p>
+                      StoreGate checks the normalized action against its runtime
+                      context.
+                    </p>
+                    <span class="pending-label">EXECUTION ON HOLD</span>
+                  </div>
+                  <div class="verdict" hidden>
+                    <div class="verdict-state">
+                      <svg
+                        class="block-icon"
+                        aria-hidden="true"
+                        viewBox="0 0 32 32"
+                      >
+                        <path d="m10 3-7 7v12l7 7h12l7-7V10l-7-7Z" />
+                        <path d="m11 11 10 10m0-10L11 21" /></svg
+                      ><svg
+                        class="review-icon"
+                        aria-hidden="true"
+                        viewBox="0 0 32 32"
+                      >
+                        <circle cx="16" cy="16" r="13" />
+                        <path d="M16 8v10m0 6v.1" /></svg
+                      ><strong id="decision"></strong>
+                    </div>
+                    <div class="verdict-detail reason-detail">
+                      <span class="tiny-label">REASON</span>
+                      <p id="reason"></p>
+                    </div>
+                    <div class="verdict-detail suggestion-detail">
+                      <span class="tiny-label">SUGGESTED SAFER ACTION</span>
+                      <p id="suggestion"></p>
                     </div>
                   </div>
-                  <div class="phone-home"></div>
-                  <span class="intercept-badge" aria-hidden="true"
-                    ><svg aria-hidden="true"><use href="#shield" /></svg>Action
-                    intercepted</span
-                  >
                 </div>
-                <div class="payload">
-                  <span class="tiny-label">UNDERLYING ACTION</span
-                  ><code
-                    ><span class="code-function">open_url</span
-                    >(stripe_checkout)</code
-                  ><code class="product-line"
-                    ><span>product =</span> digital_subscription</code
-                  >
+                <div class="stage-bottom" id="execution-status">
+                  execute() has not been called
                 </div>
-              </div>
-              <div class="stage-bottom">
-                <span class="small-dot"></span
-                ><span id="source-status"
-                  >Generated UI. Unevaluated action.</span
-                >
-              </div>
-            </article>
-
-            <div class="connector connector-in" aria-hidden="true">
-              <span class="connector-label">ACTION</span>
-              <div class="connector-line">
-                <i></i><svg><use href="#arrow" /></svg>
-              </div>
+              </article>
             </div>
-
-            <article
-              class="stage gate-stage"
-              id="gate-stage"
-              aria-labelledby="gate-title"
-            >
-              <div class="stage-heading">
-                <span class="stage-number">02</span>
-                <h2 id="gate-title">Policy gate</h2>
-                <span class="stage-dot"></span>
+            <div class="progress-row">
+              <div
+                class="timeline"
+                role="progressbar"
+                aria-label="Walkthrough progress"
+                aria-valuemin="0"
+                aria-valuemax="10"
+                aria-valuenow="0"
+              >
+                <div id="timeline-fill"></div>
               </div>
-              <div class="gate-visual" aria-hidden="true">
-                <div class="orbit orbit-outer"></div>
-                <div class="orbit orbit-inner"></div>
-                <div class="gate-axis axis-horizontal"></div>
-                <div class="gate-axis axis-vertical"></div>
-                <div class="shield-core">
-                  <svg><use href="#shield" /></svg>
-                </div>
-                <span class="gate-tick tick-top"></span
-                ><span class="gate-tick tick-bottom"></span>
-                <div class="scan-line"></div>
-              </div>
-              <div class="gate-name">
-                StoreGate<span class="brand-period">.</span
-                ><span id="gate-status">Ready to inspect</span>
-              </div>
-              <div class="runtime-context">
-                <span class="tiny-label">RUNTIME CONTEXT</span>
-                <div class="context-pair">
-                  <span>platform</span><strong>iOS</strong>
-                </div>
-                <div class="context-pair">
-                  <span>storefront</span><strong>DE</strong>
-                </div>
-                <div class="entitlement">
-                  <span>external_purchase_entitlement</span
-                  ><strong>false</strong>
-                </div>
-              </div>
-              <div class="stage-bottom">
-                <span class="small-dot"></span
-                ><span id="gate-bottom">Check the action. Apply the rule.</span>
-              </div>
-            </article>
-
-            <div class="connector connector-out" aria-hidden="true">
-              <span class="connector-label">DECISION</span>
-              <div class="connector-line">
-                <i></i><svg><use href="#arrow" /></svg>
-              </div>
+              <span class="elapsed"><span id="elapsed">00</span> / 10 s</span>
             </div>
-
-            <article
-              class="stage result-stage"
-              id="result-stage"
-              aria-labelledby="result-title"
+            <p
+              class="narration"
+              id="narration"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
             >
-              <div class="stage-heading">
-                <span class="stage-number">03</span>
-                <h2 id="result-title">Enforced outcome</h2>
-                <span class="stage-dot"></span>
-              </div>
-              <div class="result-content">
-                <div class="result-placeholder">
-                  <div class="pending-icon">
-                    <span></span><span></span><span></span>
-                  </div>
-                  <h3>Awaiting <br />the verdict.</h3>
-                  <p>
-                    The action stays at the gate<br />until the check is
-                    complete.
-                  </p>
-                  <span class="pending-label">NO ACTION EXECUTED</span>
-                </div>
-                <div class="verdict" hidden>
-                  <div class="verdict-state">
-                    <svg aria-hidden="true" viewBox="0 0 32 32">
-                      <path d="m10 3-7 7v12l7 7h12l7-7V10l-7-7Z" />
-                      <path d="m11 11 10 10m0-10L11 21" /></svg
-                    ><strong id="decision">BLOCK</strong>
-                  </div>
-                  <div class="verdict-detail reason-detail">
-                    <span class="tiny-label">REASON</span>
-                    <p id="reason"></p>
-                  </div>
-                  <div class="verdict-detail context-detail">
-                    <span class="tiny-label">CONTEXT</span>
-                    <p id="result-context"></p>
-                  </div>
-                  <div class="verdict-detail suggestion-detail">
-                    <span class="tiny-label">SUGGESTED ACTION</span>
-                    <p>
-                      <svg aria-hidden="true"><use href="#arrow" /></svg
-                      ><span id="suggestion"></span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="stage-bottom">
-                <span class="small-dot"></span
-                ><span id="result-status">Waiting for policy evaluation</span>
-              </div>
-            </article>
-          </div>
-
-          <div
-            class="timeline"
-            role="progressbar"
-            aria-label="Demo progress"
-            aria-valuemin="0"
-            aria-valuemax="12"
-            aria-valuenow="0"
-          >
-            <div class="timeline-track"><div id="timeline-fill"></div></div>
-            <ol>
-              <li data-step="0" class="current"><span>01</span> Intercept</li>
-              <li data-step="1"><span>02</span> Inspect context</li>
-              <li data-step="2"><span>03</span> Enforce policy</li>
-              <li data-step="3"><span>04</span> Protect the user</li>
-            </ol>
-          </div>
-          <p
-            class="narration"
-            id="narration"
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            A generated interface is only the surface. Run the demo to inspect
-            the action.
-          </p>
+              The module is structurally valid. Run the demo to check its
+              sensitive action.
+            </p>
+            <p class="rule-note" id="rule-note"></p>
+          </section>
           <noscript
             ><p class="noscript">
-              Enable JavaScript to run the animation. This fixed scenario
-              returns BLOCK: External digital purchase detected. iOS / DE
-              storefront / entitlement missing. Suggested action: Use approved
-              in-app purchase flow.
+              Enable JavaScript for this interactive demo. The three fixed
+              scenarios return BLOCK for external digital purchases, BLOCK for
+              personal data sent to AI without disclosure/consent, and REVIEW
+              for overly broad contact access. No sensitive action is executed.
             </p></noscript
           >
         </section>
+        <details class="integration-details">
+          <summary>
+            The integration boundary <span>validate → policy → execute</span>
+          </summary>
+          <div>
+            <p>
+              Structural validation checks the module’s shape. StoreGate then
+              normalizes and checks only its sensitive action. A BLOCK or REVIEW
+              holds execution; only PASS is eligible to proceed.
+            </p>
+            <pre><code>// Conceptual host integration — not a StemJSON API example
+if (validate(module).valid) {
+  const action = normalize(module.action);
+  const verdict = checkPolicy(action, runtimeContext);
+  if (verdict.decision === "PASS") execute(action);
+}</code></pre>
+            <p>
+              This static demo uses local fixtures and never calls
+              <code>execute()</code>, a model, an external service, or a
+              StemJSON SDK.
+            </p>
+          </div>
+        </details>
       </main>
-
       <footer class="site-footer">
         <div class="footer-brand">
           <strong>StoreGate</strong
           ><span>Runtime policy firewall for AI-generated actions</span>
         </div>
         <div class="decision-legend" aria-label="Policy decisions">
-          <span><i></i>PASS</span><span class="legend-block"><i></i>BLOCK</span
-          ><span><i></i>REVIEW</span>
+          <span>PASS <small>eligible</small></span
+          ><span class="block">BLOCK <small>stopped</small></span
+          ><span class="review">REVIEW <small>held</small></span>
         </div>
       </footer>
-      <p class="demo-note">
-        Illustrative, deterministic policy demo. Runtime enforcement — not a
-        prediction of Apple review.
-      </p>
     </div>
   </body>
 </html>

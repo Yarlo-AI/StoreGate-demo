@@ -1,9 +1,9 @@
 {
   "name": "storegate-demo",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "A deterministic, 12-second StoreGate runtime policy demo.",
+  "description": "Three deterministic StoreGate policy walkthroughs illustrating the StemJSON integration boundary.",
   "scripts": {
     "start": "node scripts/serve.mjs",
     "dev": "node scripts/serve.mjs",
